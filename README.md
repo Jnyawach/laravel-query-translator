@@ -5,7 +5,7 @@
 [![Downloads](https\://img.shields.io/packagist/dt/nyawach/laravel-query-translator.svg?style=flat-square)](https\://packagist.org/packages/nyawach/laravel-query-translator)
 
 ## Documentation, Installation, and Usage
-Please visit the [Documentation](docs/README.md) for detailed instructions on how to install and use this package.
+Please visit the [Documentation](docs/index.md) for detailed instructions on how to install and use this package.
 
 ## What It Does
 This package allows you to quickly generate SQL queries from a JSON-based query structure. It is particularly useful for building Business Intelligence (BI) tools, where users can create complex queries through a user-friendly JSON without needing to write SQL code manually.
