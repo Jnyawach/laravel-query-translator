@@ -1,0 +1,26 @@
+{
+    "name": "nyawach/laravel-query-translator",
+    "description": "Parse JSON-defined business intelligence queries into SQL using Laravel. Build flexible, dynamic reporting and dashboard features with ease.",
+    "type": "package",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Nyawach\\LaravelQueryTranslator\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Nyawach\\LaravelQueryTranslator\\QueryTranslatorProvider"
+            ]
+        }
+    },
+    "authors": [
+        {
+            "name": "Jnyawach",
+            "email": "nyawach41@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+}
