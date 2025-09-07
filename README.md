@@ -68,3 +68,29 @@ return QueryTranslator::execute($request->all());
     }
 ]
 ```
+
+## Change Log
+Please see [CHANGELOG](CHANGELOG.md) for more information recent changes.
+
+## Contributing
+Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
+
+## Testing
+To run the tests, execute the following command in your terminal:
+```bash
+composer test
+```
+
+## Security & Vulnerabilities
+If you discover any security related issues, please email 
+[security@artisanlabs.dev](mailto:security@artisanlabs.dev)
+
+## Credits
+
+- [Morris Mburu](https://github.com/MorrisMburu)
+- [Joshua Nyawach](https://github.com/Jnyawach)
+
+This package has been highly inspired by Metabase a querying and visualization layer for your databases
+
+## License
+The MIT License (MIT). Please see [LICENSE](LICENSE.md) for more information.
