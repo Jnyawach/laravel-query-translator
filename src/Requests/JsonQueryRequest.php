@@ -11,6 +11,8 @@ use Nyawach\LaravelQueryTranslator\Enums\FunctionEnum;
 use Nyawach\LaravelQueryTranslator\Enums\JoinTypeEnum;
 use Nyawach\LaravelQueryTranslator\Enums\OperatorEnum;
 use Nyawach\LaravelQueryTranslator\Enums\SortEnum;
+use Nyawach\LaravelQueryTranslator\Rules\ValidateColumnExists;
+use Nyawach\LaravelQueryTranslator\Rules\ValidateSchemaExists;
 
 class JsonQueryRequest extends FormRequest
 {
@@ -23,18 +25,43 @@ class JsonQueryRequest extends FormRequest
     public function rules():array
     {
         return [
-            'tables'=>['required', ''],
+            'table'=>['required', 'string', new ValidateSchemaExists()],
+
+            //validate joins
             'joins'=>['nullable','array'],
-            'joins.*.primary'=>['required_with:jsons', 'string'],
-            'joins.*.join_type'=>['required_with:jsons', 'string',Rule::enum(JoinTypeEnum::class)],
-            'joins.*.join_table'=>['required_with:jsons', 'string'],
-            'joins.*.join_column'=>['required_with:jsons', 'string'],
-            'joins.*.join_operator'=>['required_with:jsons', 'string', Rule::enum(OperatorEnum::class)],
+            'joins.*.left_table'=>['required_with:joins', 'string',new ValidateSchemaExists()],
+            'joins.*.join_type'=>['required_with:joins', 'string',Rule::enum(JoinTypeEnum::class)],
+            'joins.*.right_table'=>['required_with:joins', 'string'],
+
+            //validate conditions
+            'joins.*.conditions'=>['required_with:joins', 'array'],
+            'joins.*.conditions.*.left_column'=>[
+                'required_with:joins.*.conditions',
+                'string',
+                new ValidateColumnExists($this->request->input('joins.*.left_table'))
+            ],
+            'joins.*.conditions.*.operator'=>['required_with:joins.*.conditions', 'string',Rule::enum(OperatorEnum::class)],
+            'joins.*.conditions.*.right_column'=>[
+                'required_with:joins.*.conditions',
+                'string',
+                new ValidateColumnExists($this->request->input('joins.*.right_table'))
+            ],
 
             'filters'=>['nullable','array'],
-            'filters.*.filter_column'=>['required_with:filters', 'string'],
-            'filters.*.filter_operator'=>['required_with:filters', 'string', Rule::enum(FilterEnum::class)],
-            'filters.*.filter_value'=>['nullable', 'string','required_unless:'.FilterEnum::IS_EMPTY->value.','.FilterEnum::IS_NOT_EMPTY->value],
+            'filters.*.table'=>[
+                'nullable',
+                'required_with:filters',
+                'string',
+                new ValidateSchemaExists()
+            ],
+            'filters.*.column'=>[
+                'nullable',
+                'required_with:filters',
+                'string',
+                new ValidateColumnExists($this->request->input('filters.*.table'))
+            ],
+            'filters.*.operator'=>['required_with:filters', 'string', Rule::enum(FilterEnum::class)],
+            'filters.*.value'=>config('query-operators')[$this->request->input('filters.*.operator')]['value_validation'],
 
             'summary'=>['nullable'],
             'summary.summarizations'=>['required_with:summary', 'array'],
