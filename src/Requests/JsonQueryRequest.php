@@ -1,11 +1,9 @@
 <?php
 
-namespace Nyawach\LaravelQueryTranslator\Validator;
+namespace Nyawach\LaravelQueryTranslator\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\ValidationException;
 use Nyawach\LaravelQueryTranslator\Enums\FilterEnum;
 use Nyawach\LaravelQueryTranslator\Enums\FunctionEnum;
 use Nyawach\LaravelQueryTranslator\Enums\JoinTypeEnum;
@@ -61,20 +59,81 @@ class JsonQueryRequest extends FormRequest
                 new ValidateColumnExists($this->request->input('filters.*.table'))
             ],
             'filters.*.operator'=>['required_with:filters', 'string', Rule::enum(FilterEnum::class)],
-            'filters.*.value'=>config('query-operators')[$this->request->input('filters.*.operator')]['value_validation'],
+            'filters.*.value'=>$this->validateFieldValue($this->request->input('filters.*.value'), $this->request->input('filters.*.operator')),
 
-            'summary'=>['nullable'],
-            'summary.summarizations'=>['required_with:summary', 'array'],
-            'summary.summarizations.*.summarization_column'=>['required_with:summary.*.summarizations', 'string'],
-            'summary.summarizations.*.summarization_operation'=>['required_with:summary.*.summarizations', 'string',Rule::enum(FunctionEnum::class)],
-            'summary.group_by'=>['nullable', 'array'],
-            'summary.group_by.*.group_by_column'=>['required_with:group_by', 'string'],
+           // Selected Columns
+            'selected_columns'=>[
+                'nullable',
+                'array',
+            ],
+            'selected_columns.*.table'=>[
+                'nullable',
+                'required_with:selected_columns',
+                'string', new ValidateSchemaExists()
+            ],
+            'selected_columns.*.column'=>[
+                'nullable',
+                'required_with:selected_columns',
+                'string',
+                new ValidateColumnExists($this->request->input('selected_columns.*.table'))
+            ],
+            'selected_columns.*.alias'=>['nullable','required_with:selected_columns','string'],
+
+            //Group By
+            'group_by'=>['nullable', 'array'],
+            'group_by.*.table' => [
+                'nullable',
+                'required_with:group_by',
+                'string',
+                new ValidateSchemaExists()
+            ],
+            'group_by.*.column'=>[
+                'nullable',
+                'required_with:group_by',
+                'string',
+                new ValidateColumnExists($this->request->input('group_by.*.table'))
+            ],
+
+
+            //Aggregation
+            'aggregations'=>['nullable', 'array'],
+            'aggregations.*.function'=>[
+                'nullable',
+                'required_with:aggregations',
+                'string', Rule::enum(FunctionEnum::class)
+            ],
+            'aggregations.*.table'=>[
+
+            ],
+            'aggregations.*.column'=>[
+                'nullable',
+                'required_with:aggregations',
+                'string',
+
+            ],
 
             'sort'=>['nullable', 'array'],
             'sort.*.sort_field'=>['required_with:sort', 'string'],
             'sort.*.sort_order'=>['required_with:sort', 'string', Rule::enum(SortEnum::class)],
 
         ];
+    }
+
+    public function validateFieldValue(mixed $value, string $operator):array
+    {
+        $rules=config('query-operators')[$operator]['value_validation'];
+        $data=[];
+        if (in_array('array', $rules)){
+          $data= $rules;
+          $data['filters.*.value.*']=config('query-operators')[$operator]['value_validation'];
+        }else{
+            $data= [
+              $rules,
+                ...config('query-operators')[$operator]['value_validation']
+
+            ];
+        }
+        return $data;
     }
 
 }
