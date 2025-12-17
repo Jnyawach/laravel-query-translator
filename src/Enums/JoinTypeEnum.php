@@ -4,16 +4,20 @@ namespace Nyawach\LaravelQueryTranslator\Enums;
 
 enum JoinTypeEnum:string
 {
-    case INNER = 'inner';
-    case LEFT = 'left';
-    case RIGHT = 'right';
+    case INNER_JOIN = 'inner_join';
+    case LEFT_JOIN = 'left_join';
+    case RIGHT_JOIN = 'right_join';
+    case FULL_JOIN = 'full_join';
+    case CROSS_JOIN = 'cross_join';
 
     public function label(): string
     {
         return match ($this) {
-            self::INNER => 'Inner',
-            self::LEFT => 'Left',
-            self::RIGHT => 'Right',
+            self::INNER_JOIN => 'Inner Join',
+            self::LEFT_JOIN => 'Left Join',
+            self::RIGHT_JOIN => 'Right Join',
+            self::FULL_JOIN => 'Full Join',
+            self::CROSS_JOIN => 'Cross Join',
         };
     }
     public static function all():array

@@ -1,6 +1,7 @@
 <?php
 
-namespace Nyawach\LaravelQueryTranslator\Requests;
+namespace Nyawach\LaravelQueryTranslator\Http\Requests;
+
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -10,6 +11,7 @@ use Nyawach\LaravelQueryTranslator\Enums\JoinTypeEnum;
 use Nyawach\LaravelQueryTranslator\Enums\OperatorEnum;
 use Nyawach\LaravelQueryTranslator\Enums\SortEnum;
 use Nyawach\LaravelQueryTranslator\Rules\ValidateColumnExists;
+use Nyawach\LaravelQueryTranslator\Rules\ValidateFieldRule;
 use Nyawach\LaravelQueryTranslator\Rules\ValidateSchemaExists;
 
 class JsonQueryRequest extends FormRequest
@@ -36,13 +38,13 @@ class JsonQueryRequest extends FormRequest
             'joins.*.conditions.*.left_column'=>[
                 'required_with:joins.*.conditions',
                 'string',
-                new ValidateColumnExists($this->request->input('joins.*.left_table'))
+                new ValidateColumnExists($this->input('joins',[]),'left_table')
             ],
             'joins.*.conditions.*.operator'=>['required_with:joins.*.conditions', 'string',Rule::enum(OperatorEnum::class)],
             'joins.*.conditions.*.right_column'=>[
                 'required_with:joins.*.conditions',
                 'string',
-                new ValidateColumnExists($this->request->input('joins.*.right_table'))
+                new ValidateColumnExists($this->input('joins',[]),'right_table')
             ],
 
             'filters'=>['nullable','array'],
@@ -56,10 +58,10 @@ class JsonQueryRequest extends FormRequest
                 'nullable',
                 'required_with:filters',
                 'string',
-                new ValidateColumnExists($this->request->input('filters.*.table'))
+                new ValidateColumnExists($this->input('filters',[]),'table')
             ],
             'filters.*.operator'=>['required_with:filters', 'string', Rule::enum(FilterEnum::class)],
-            'filters.*.value'=>$this->validateFieldValue($this->request->input('filters.*.value'), $this->request->input('filters.*.operator')),
+            'filters.*.value'=>new ValidateFieldRule($this->input('filters', [])),
 
            // Selected Columns
             'selected_columns'=>[
@@ -75,7 +77,7 @@ class JsonQueryRequest extends FormRequest
                 'nullable',
                 'required_with:selected_columns',
                 'string',
-                new ValidateColumnExists($this->request->input('selected_columns.*.table'))
+                new ValidateColumnExists($this->input('selected_columns'),'table')
             ],
             'selected_columns.*.alias'=>['nullable','required_with:selected_columns','string'],
 
@@ -91,7 +93,7 @@ class JsonQueryRequest extends FormRequest
                 'nullable',
                 'required_with:group_by',
                 'string',
-                new ValidateColumnExists($this->request->input('group_by.*.table'))
+                new ValidateColumnExists($this->input('group_by'),'table')
             ],
 
 
@@ -117,23 +119,6 @@ class JsonQueryRequest extends FormRequest
             'sort.*.sort_order'=>['required_with:sort', 'string', Rule::enum(SortEnum::class)],
 
         ];
-    }
-
-    public function validateFieldValue(mixed $value, string $operator):array
-    {
-        $rules=config('query-operators')[$operator]['value_validation'];
-        $data=[];
-        if (in_array('array', $rules)){
-          $data= $rules;
-          $data['filters.*.value.*']=config('query-operators')[$operator]['value_validation'];
-        }else{
-            $data= [
-              $rules,
-                ...config('query-operators')[$operator]['value_validation']
-
-            ];
-        }
-        return $data;
     }
 
 }

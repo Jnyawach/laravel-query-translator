@@ -9,6 +9,9 @@ class SchemaReaderFactory
     public static function make():  SchemaReaderInterface
     {
         $connection = config('query-translator.connection');
+        if (!$connection) {
+            throw new \RuntimeException('Connection not found');
+        }
         $driver = DB::connection($connection)->getDriverName();
         return match ($driver) {
             'mysql' => new MysqlSchemaReader($connection),

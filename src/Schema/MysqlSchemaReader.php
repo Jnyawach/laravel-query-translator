@@ -17,15 +17,19 @@ class MysqlSchemaReader implements SchemaReaderInterface
         $this->excludedTables = config('query-translator.excluded_tables', []);
         $this->excludedColumns = config('query-translator.excluded_columns', []);
     }
-    public function getTables(): array
+    public function getTables(string $search=null): array
     {
         $connection = DB::connection($this->connection);
         $databaseName = $connection->getDatabaseName();
 
         $tables=$connection->table('information_schema.tables')
             ->select(DB::raw('TABLE_NAME as table_name'))
+            ->when($search, fn($query, $search) =>
+            $query->whereRaw('LOWER(table_name) like ?', ['%' . strtolower($search) . '%'])
+            )
             ->where('table_schema', $databaseName)
             ->whereNotIn('table_name', $this->excludedTables)
+            ->take(100)
             ->pluck('table_name')
             ->toArray();
 
@@ -33,7 +37,7 @@ class MysqlSchemaReader implements SchemaReaderInterface
         foreach($tables as $table){
             $table_array[]=[
                 'label' => Str::title(str_replace('_', ' ', $table)),
-                'column' => $table,
+                'value' => $table,
             ];
 
         }

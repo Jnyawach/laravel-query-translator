@@ -9,7 +9,7 @@ interface SchemaReaderInterface
      *
      * @return array
      */
-    public function getTables(): array;
+    public function getTables(string $search=null): array;
 
     /**
      * Get columns for a specific table.

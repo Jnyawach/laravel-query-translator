@@ -19,13 +19,14 @@ class PostgresSchemaReader implements SchemaReaderInterface
         $this->excludedColumns = config('query-translator.excluded_columns', []);
     }
 
-    public function getTables(): array
+    public function getTables(string $search=null): array
     {
 
         $tables= DB::connection($this->connection)
             ->table('information_schema.tables')
             ->where('table_schema', 'public')
             ->where('table_type', 'BASE TABLE')
+            ->when($search, fn($query, $search) => $query->where('table_name', 'ilike', "%{$search}%"))
             ->whereNotIn('table_name', $this->excludedTables)
             ->pluck('table_name')
             ->toArray();

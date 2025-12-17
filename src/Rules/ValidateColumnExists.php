@@ -8,16 +8,29 @@ use Illuminate\Support\Facades\Schema;
 
 class ValidateColumnExists implements ValidationRule
 {
-    public function __construct(private string $tableName)
+    public function __construct(
+        private mixed $field,
+        private string $fieldName
+    )
     {}
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        if (Schema::hasTable($this->tableName)){
-            if(!Schema::hasColumn($this->tableName,$value)){
-                $fail('The :attribute does not exist in the table-'.$this->tableName.'.');
+        // Extract the index using explode
+        $segments = explode('.', $attribute);
+        $index = $segments[1];
+        $tableName = $this->field[$index][$this->fieldName] ?? null;
+        if (!$tableName) {
+            $fail("The table for index {$index} is missing.");
+            return;
+        }
+
+        // Validate table & column existence
+        if (Schema::hasTable($tableName)){
+            if(!Schema::hasColumn($tableName,$value)){
+                $fail('The :attribute does not exist in the table-'.$tableName.'.');
             }
         }else{
-            $fail('The :attribute does not exist in the database.');
+            $fail("The table for index {$index} is missing.");
         }
 
     }

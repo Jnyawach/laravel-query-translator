@@ -13,9 +13,13 @@ class QueryTranslatorProvider extends ServiceProvider
     public function register(): void
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/query-translator.php', 'query-translator');
-
+        $this->mergeConfigFrom(
+            __DIR__.'/../config/query-operators.php', 'query-operators'
+        );
+        $this->mergeConfigFrom(
+            __DIR__.'/../config/column-type-validation.php', 'column-type-validation'
+        );
         $this->app->singleton('schema-reader', function ($app) {
-            $config = $app['config']->get('query-translator');
             return (new SchemaReaderFactory())->make();
         });
 

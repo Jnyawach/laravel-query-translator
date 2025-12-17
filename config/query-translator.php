@@ -10,7 +10,7 @@ return[
       | You can set it to null to use the default connection from your config.
       |
       */
-    'connection' => env('DB_CONNECTION_M', null),
+    'connection' => env('DB_CONNECTION', null),
 
     /*
      * |-------------------------------------------------------------------------
