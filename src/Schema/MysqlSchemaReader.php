@@ -54,14 +54,15 @@ class MysqlSchemaReader implements SchemaReaderInterface
             ->where('table_name', $table)
             ->select(DB::raw('COLUMN_NAME as column_name'))
             ->whereNotIn('column_name', $this->excludedColumns)
-            ->pluck('column_name')
-            ->toArray();
+            ->select(DB::raw('COLUMN_NAME as column_name, DATA_TYPE as data_type'))
+            ->get();
 
         $column_array=[];
         foreach($columns as $column){
             $column_array[]=[
-                'label' => Str::title(str_replace('_', ' ', $table)).' : '.Str::title(str_replace('_', ' ', $column)),
-                'column' => $column,
+                'label' => Str::title(str_replace('_', ' ', $table)).' : '.Str::title(str_replace('_', ' ', $column->column_name)),
+                'data_type' => $column->data_type,
+                'value' => $column->column_name,
             ];
 
         }

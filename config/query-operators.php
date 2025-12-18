@@ -43,10 +43,6 @@ return [
         'value_validation' => ['required', 'array', 'size:2'],
         'value_type' => 'array'
     ],
-    FilterEnum::LIKE->value => [
-        'value_validation' => ['required'],
-        'value_type' => 'string'
-    ],
     FilterEnum::STARTS_WITH->value => [
         'value_validation' => ['required'],
         'value_type' => 'string'

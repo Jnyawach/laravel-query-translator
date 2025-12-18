@@ -14,7 +14,6 @@ enum FilterEnum:string
     case NOT_IN = 'NOT_IN';
     case BETWEEN = 'BETWEEN';
     case NOT_BETWEEN = 'NOT_BETWEEN';
-    case LIKE = 'LIKE';
     case STARTS_WITH = 'STARTS_WITH';
     case ENDS_WITH = 'ENDS_WITH';
     case IS_NULL = 'IS_NULL';
@@ -35,7 +34,6 @@ enum FilterEnum:string
             self::NOT_IN => 'Not In',
             self::BETWEEN => 'Between',
             self::NOT_BETWEEN => 'Not Between',
-            self::LIKE => 'Like',
             self::STARTS_WITH => 'Starts With',
             self::ENDS_WITH => 'Ends With',
             self::IS_NULL => 'Is Null',
